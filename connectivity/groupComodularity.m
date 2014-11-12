@@ -63,12 +63,12 @@ end
 figure(figNum)
 subplot(3,1,1)
 imagesc(mean(corrMat, 3))
-title('Mean Group Connectivity')
+title('Mean Subject Connectivity')
 caxis([-0.3 0.5])
 axis off
 subplot(3,1,2)
 imagesc(modularity.meanCoMod)
-title('Mean Group Comodularity')
+title('Mean Subject Comodularity')
 caxis([0 1])
 axis off
 subplot(3,1,3)

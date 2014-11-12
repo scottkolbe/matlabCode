@@ -1,4 +1,4 @@
-function corrNetworkBehaviour(corrMat, behav1, behav2, numSamps)
+function [table1, table2] = corrNetworkBehaviour(corrMat, behav1, behav2, numSamps)
 
 % calculate comodularity for each subject and then whole group
 % correlat network parameters with behavioural variables
@@ -51,16 +51,16 @@ strongNodesNeg = find(strengthNegG>mean(strengthNegG)+std(strengthNegG));
 figure(1)
 subplot(2,2,1)
 imagesc(strengthPos')
-caxis([0 0.04])
+caxis([0 0.05])
 subplot(2,2,2)
 imagesc(strengthNeg')
-caxis([0 0.04])
+caxis([0 0.05])
 subplot(2,2,3)
 imagesc(particPos')
-caxis([0 0.7])
+caxis([0 1])
 subplot(2,2,4)
 imagesc(particNeg')
-caxis([0 0.7])
+caxis([0 1])
 
 for node = 1:size(corrMat, 1)
     [strPosAccR(node) strPosAccP(node)] =  partialcorr(strengthPos(node, :)', behav1, behav2, 'type', 'Spearman');
@@ -115,5 +115,5 @@ hold on
 stem(-log(parNegLatP))
 title('Negative Participation vs Latency')
 
-table1 = [strPosAccR' strPosAccP' parPosAccR' parPosAccP' strNegAccR' strNegAccP' parNegAccR' parNegAccP']
-table2 = [strPosLatR' strPosLatP' parPosLatR' parPosLatP' strNegLatR' strNegLatP' parNegLatR' parNegLatP']
+table1 = [strPosAccR' strPosAccP' parPosAccR' parPosAccP' strNegAccR' strNegAccP' parNegAccR' parNegAccP'];
+table2 = [strPosLatR' strPosLatP' parPosLatR' parPosLatP' strNegLatR' strNegLatP' parNegLatR' parNegLatP'];
