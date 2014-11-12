@@ -1,0 +1,53 @@
+function [dyad_coher] = calc_dyad_coherence
+
+% script calculates the mean dyadic tensor (using the function 'calc_dyad_tensor') 
+% for all control subjects after transformation to standard spce
+
+% the mean dyadic tensor is then used to calculate the dyadic coherence
+% this method is based on:
+% Jones et al., (2000) "Spatial Normalisation and Averaging of Diffusion Tensor MRI Data Sets"
+% NeuroImage, 17:592-617 
+
+
+V1 = single(zeros(91,109,91,21,3));
+
+V1(:,:,:,:,1)=read_avw('/data/soma/users/skolbe/on_cohort_2007/OR_analysis/all_control_FA/all_V1_1');
+V1(:,:,:,:,2)=read_avw('/data/soma/users/skolbe/on_cohort_2007/OR_analysis/all_control_FA/all_V1_2');
+V1(:,:,:,:,3)=read_avw('/data/soma/users/skolbe/on_cohort_2007/OR_analysis/all_control_FA/all_V1_3');
+
+V1_all = single(permute(V1, [1 2 3 5 4]));
+clear V1;
+
+dyad_tensor_all = zeros(91,109,91,6,21);
+
+for ii = 1:2 %size(V1,5)
+	
+	calculating_subject = ii
+	dyad_tensor_all(:,:,:,:,ii) = calc_dyad_tensor(squeeze(V1_all(:,:,:,:,ii)));
+
+end
+
+clear V1_all;
+
+dyad_tensor_mean = squeeze(mean(dyad_tensor_all,5));
+dyad_coherence = zeros(91,109,91);
+
+for ii=1:size(dyad_coherence,1)
+	for jj=1:size(dyad_coherence,2)
+		for kk=1:size(dyad_coherence,3)
+			if(~isempty(dyad_tensor_mean(ii,jj,kk,:)))
+			tensor = squeeze([dyad_tensor_mean(ii,jj,kk,1)  dyad_tensor_mean(ii,jj,kk,4) dyad_tensor_mean(ii,jj,kk,5); dyad_tensor_mean(ii,jj,kk,4) dyad_tensor_mean(ii,jj,kk,2) dyad_tensor_mean(ii,jj,kk,6); dyad_tensor_mean(ii,jj,kk,5) dyad_tensor_mean(ii,jj,kk,6) dyad_tensor_mean(ii,jj,kk,3)]);
+			
+			[U,S,V] = svd(tensor);
+
+			eigs = diag(S);
+			
+			dyad_coherence(ii,jj,kk) = (1 - sqrt((eigs(2) + eigs(3))/(2*eigs(1))));
+			end
+		end
+	end
+end
+
+dyad_coher = struct('dyad_coherence',{dyad_coherence}, 'dyad_tensor_all',{dyad_tensor_all});
+save dyad_coher.mat dyad_coher;
+
