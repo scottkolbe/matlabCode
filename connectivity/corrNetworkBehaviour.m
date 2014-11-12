@@ -1,6 +1,7 @@
 function corrNetworkBehaviour(corrMat, behav1, behav2, numSamps)
 
-% for each subject calculate modularity using louvain method and resultant comodularity matrix
+% calculate comodularity for each subject and then whole group
+% correlat network parameters with behavioural variables
 
 for subj=1:size(corrMat,3)
     thisMat=corrMat(:,:,subj);
