@@ -1,7 +1,8 @@
-function [table1, table2] = corrNetworkBehaviour(corrMat, behav1, behav2, numSamps)
+function [table1, table2] = corrNetworkBehaviour(corrMat, behav1, behav2, modularity, numSamps)
 
 % calculate comodularity for each subject and then whole group
 % correlat network parameters with behavioural variables
+[Y,I] = sort(modularity.CiNewG);
 
 for subj=1:size(corrMat,3)
     thisMat=corrMat(:,:,subj);
@@ -32,11 +33,11 @@ for subj=1:size(corrMat,3)
         nodeMod = nodeMod + 1;
     end
     [Spos Sneg vpos vneg] = strengths_und_sign(thisMat);
-    strengthPos(:,subj) = (Spos./vpos); 
-    strengthNeg(:,subj) = (Sneg./vneg);
+    strengthPos(I,subj) = (Spos./vpos); 
+    strengthNeg(I,subj) = (Sneg./vneg);
     [Ppos Pneg] = participation_coef_sign(thisMat,Ci);
-    particPos(:,subj) = Ppos;
-    particNeg(:,subj) = Pneg;
+    particPos(I,subj) = Ppos;
+    particNeg(I,subj) = Pneg;
     disp(sprintf('Number of modules for subject %i = %i', subj, max(Ci)))
     numMod(subj) = max(Ci); 
 end
@@ -49,18 +50,18 @@ strongNodesNeg = find(strengthNegG>mean(strengthNegG)+std(strengthNegG));
 
 
 figure(1)
-subplot(2,2,1)
+subplot(2,1,1)
 imagesc(strengthPos')
 caxis([0 0.05])
-subplot(2,2,2)
+subplot(2,1,2)
 imagesc(strengthNeg')
 caxis([0 0.05])
-subplot(2,2,3)
-imagesc(particPos')
-caxis([0 1])
-subplot(2,2,4)
-imagesc(particNeg')
-caxis([0 1])
+% subplot(2,2,3)
+% imagesc(particPos')
+% caxis([0 1])
+% subplot(2,2,4)
+% imagesc(particNeg')
+% caxis([0 1])
 
 for node = 1:size(corrMat, 1)
     [strPosAccR(node) strPosAccP(node)] =  partialcorr(strengthPos(node, :)', behav1, behav2, 'type', 'Spearman');
