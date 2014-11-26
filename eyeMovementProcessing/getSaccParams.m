@@ -1,4 +1,6 @@
-function [saccparams, ev] = getSaccParams(matFile, triggerFile, targetsFile, xlsFile)
+function [saccparams, ev] = getSaccParams(matFile, triggerFile, targetsFile, xlsFile, study)
+
+% STUDY = 'arc' / 'pmfx' 
 
 %% initialise some variables
 saccparams = struct;
@@ -189,7 +191,11 @@ filename = xlsFile;
 
 %% Import the data
 [~, ~, raw] = xlsread(filename,'Sheet1');
-raw = raw(6:197,1:70);
+if strcmp(study, 'pmfx')
+    raw = raw(6:197,[2:45 47:72]);
+elseif strcmp(study, 'arc')
+    raw = raw(6:197,1:70);
+end
 raw(cellfun(@(x) ~isempty(x) && isnumeric(x) && isnan(x),raw)) = {''};
 cellVectors = raw(:,[2,4,17,18,19]);
 raw = raw(:,[1,3,5,6,7,8,9,10,11,12,13,14,15,16,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70]);
@@ -286,7 +292,7 @@ allPsOtherErrorInds = [find(strcmp(saccparams.ps.errorType,'blink')); find(strcm
 allAsOtherErrorInds = [find(strcmp(saccparams.as.errorType,'blink')); find(strcmp(saccparams.as.errorType,'sigdrop')); ...
     find(strcmp(saccparams.as.errorType,'unstab')); find(strcmp(saccparams.as.errorType,'antic'))];
 
-allErrInds = union(allPsDirErrorInds, allAsDirErrorInds, allPsOtherErrorInds, allAsOtherErrorInds);
+allErrInds = [allPsDirErrorInds; allAsDirErrorInds; allPsOtherErrorInds; allAsOtherErrorInds];
 
 allPsInds = find(~isnan(saccparams.as.latency));
 allAsInds = find(~isnan(saccparams.ps.latency));
@@ -303,7 +309,7 @@ for ii = 1:length(allPsInds)
         allPsPsInds(1) = 1;
     else
         prevInd = allPsInds(ii) - 1;
-        if ~isemtpy(find(allPsInds == prevInd))
+        if ~isempty(find(allPsInds == prevInd))
             allPsPsInds = [allPsPsInds; thisInd];
         elseif ~isempty(find(allAsInds == prevInd));
             allAsPsInds = [allAsPsInds; thisInd];
@@ -319,7 +325,7 @@ for ii = 1:length(allAsInds)
         allAsAsInds(1) = 1;
     else
         prevInd = allAsInds(ii) - 1;
-        if ~isemtpy(find(allAsInds == prevInd))
+        if ~isempty(find(allAsInds == prevInd))
             allAsAsInds = [allAsAsInds; thisInd];
         elseif ~isempty(find(allPsInds == prevInd));
             allPsAsInds = [allPsAsInds; thisInd];
