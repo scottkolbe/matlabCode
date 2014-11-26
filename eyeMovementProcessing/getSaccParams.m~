@@ -6,7 +6,7 @@ function [saccparams, ev] = getSaccParams(matFile, triggerFile, targetsFile, xls
 saccparams = struct;
 ev = struct;
 TR = 2.5;
-numVols = 128;
+numVols = 110; % a conservative estimate of the number of volumes for the last run
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Import gaze data from .mat file
@@ -191,10 +191,9 @@ filename = xlsFile;
 
 %% Import the data
 [~, ~, raw] = xlsread(filename,'Sheet1');
-switch stec
 if strcmp(study, 'pmfx')
     raw = raw(6:197,[2:45 47:72]);
-elseif strcmp(study)
+elseif strcmp(study, 'arc')
     raw = raw(6:197,1:70);
 end
 raw(cellfun(@(x) ~isempty(x) && isnumeric(x) && isnan(x),raw)) = {''};
@@ -269,7 +268,7 @@ clearvars data raw cellVectors R;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find start times of each valid fMRI run (>numVols volumes) and normalise onset times
 saccparams.all.triggerIntervals = saccparams.all.triggerTimes(2:end)-saccparams.all.triggerTimes(1:end-1);
-initialRunTriggers = find(saccparams.all.triggerIntervals > 20000)+1;
+initialRunTriggers = find(saccparams.all.triggerIntervals > TR*1000+5)+1; % allow +5ms error in trigger timing
 MRIstartInds = 1;
 for ii = 1:length(initialRunTriggers)
         MRIstartInds = [MRIstartInds; initialRunTriggers(ii)];
@@ -277,8 +276,8 @@ end
 lengths = [MRIstartInds(2:end); length(saccparams.all.triggerTimes)] - MRIstartInds;
 validRuns = find(lengths >= numVols);
 disp(sprintf('Found %i valid runs: \n', length(validRuns)));
-for run = 1:length(validRuns)
-    disp(sprintf('%i \n', validRuns(run)));
+for run = 1:length(lengths)
+    disp(sprintf('Run %i : %i \n', run, lengths(run)));
 end
 MRIstartTimes = saccparams.all.triggerTimes(MRIstartInds(validRuns));
 MRIstartTimesStd = (MRIstartTimes - saccparams.all.triggerTimes(1))/1000;
@@ -293,7 +292,7 @@ allPsOtherErrorInds = [find(strcmp(saccparams.ps.errorType,'blink')); find(strcm
 allAsOtherErrorInds = [find(strcmp(saccparams.as.errorType,'blink')); find(strcmp(saccparams.as.errorType,'sigdrop')); ...
     find(strcmp(saccparams.as.errorType,'unstab')); find(strcmp(saccparams.as.errorType,'antic'))];
 
-allErrInds = [allPsDirErrorInds; allAsDirErrorInds; allPsOtherErrorInds; allAsOtherErrorInds];
+allErrInds = sort([allPsDirErrorInds; allAsDirErrorInds; allPsOtherErrorInds; allAsOtherErrorInds]);
 
 allPsInds = find(~isnan(saccparams.as.latency));
 allAsInds = find(~isnan(saccparams.ps.latency));
@@ -382,7 +381,7 @@ for run = 1:length(validRuns)
     ev.psOtherErrortargOnsetTime{run} =  [ev.psOtherErrortargOnsetTime{run} ones(size(ev.psOtherErrortargOnsetTime{run}, 1), 1) ones(size(ev.psOtherErrortargOnsetTime{run}, 1), 1)];
     ev.asOtherErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(asOtherErrorInds{run});
     ev.asOtherErrortargOnsetTime{run} =  [ev.asOtherErrortargOnsetTime{run} ones(size(ev.asOtherErrortargOnsetTime{run}, 1), 1) ones(size(ev.asOtherErrortargOnsetTime{run}, 1), 1)];
-    ev.eye{1} = [(eyeTimes(eyeInds{run})-MRIstartTimes(run))/1000 ones(size(eyeInds{run}, 1),1)*eyeRes/1000 eyeVel(eyeInds{run})];
+    ev.eye{run} = [(eyeTimes(eyeInds{run})-MRIstartTimes(run))/1000 ones(size(eyeInds{run}, 1),1)*eyeRes/1000 eyeVel(eyeInds{run})];
 end
 
 

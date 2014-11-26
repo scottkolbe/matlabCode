@@ -6,7 +6,7 @@ function [saccparams, ev] = getSaccParams(matFile, triggerFile, targetsFile, xls
 saccparams = struct;
 ev = struct;
 TR = 2.5;
-numVols = 128;
+numVols = 110; % a conservative estimate of the number of volumes for the last run
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Import gaze data from .mat file
@@ -268,7 +268,7 @@ clearvars data raw cellVectors R;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find start times of each valid fMRI run (>numVols volumes) and normalise onset times
 saccparams.all.triggerIntervals = saccparams.all.triggerTimes(2:end)-saccparams.all.triggerTimes(1:end-1);
-initialRunTriggers = find(saccparams.all.triggerIntervals > 20000)+1;
+initialRunTriggers = find(saccparams.all.triggerIntervals > TR*1000+5)+1; % allow +5ms error in trigger timing
 MRIstartInds = 1;
 for ii = 1:length(initialRunTriggers)
         MRIstartInds = [MRIstartInds; initialRunTriggers(ii)];
@@ -276,8 +276,8 @@ end
 lengths = [MRIstartInds(2:end); length(saccparams.all.triggerTimes)] - MRIstartInds;
 validRuns = find(lengths >= numVols);
 disp(sprintf('Found %i valid runs: \n', length(validRuns)));
-for run = 1:length(validRuns)
-    disp(sprintf('%i \n', validRuns(run)));
+for run = 1:length(lengths)
+    disp(sprintf('Run %i : %i \n', run, lengths(run)));
 end
 MRIstartTimes = saccparams.all.triggerTimes(MRIstartInds(validRuns));
 MRIstartTimesStd = (MRIstartTimes - saccparams.all.triggerTimes(1))/1000;
@@ -292,7 +292,7 @@ allPsOtherErrorInds = [find(strcmp(saccparams.ps.errorType,'blink')); find(strcm
 allAsOtherErrorInds = [find(strcmp(saccparams.as.errorType,'blink')); find(strcmp(saccparams.as.errorType,'sigdrop')); ...
     find(strcmp(saccparams.as.errorType,'unstab')); find(strcmp(saccparams.as.errorType,'antic'))];
 
-allErrInds = [allPsDirErrorInds; allAsDirErrorInds; allPsOtherErrorInds; allAsOtherErrorInds];
+allErrInds = sort([allPsDirErrorInds; allAsDirErrorInds; allPsOtherErrorInds; allAsOtherErrorInds]);
 
 allPsInds = find(~isnan(saccparams.as.latency));
 allAsInds = find(~isnan(saccparams.ps.latency));
@@ -338,7 +338,7 @@ end
 % find indices for each run
 runInds = cell(length(validRuns), 1);
 for run = 1:length(validRuns)
-    runInds{run} = intersect(find(saccparams.all.targetOnsetTime >= MRIstartTimesStd(run)), find(saccparams.all.targetOnsetTime < MRIstartTimesStd(run)+numVols*TR));
+    runInds{run} = intersect(find(saccparams.all.targetOnsetTime >= MRIstartTimesStd(run)), find(saccparams.all.targetOnsetTime < MRIstartTimesStd(run)+133*TR));
 end
 
 % get Inds for each trial type and eye velocity vector
@@ -354,34 +354,34 @@ for run = 1:length(validRuns)
     asDirErrorInds{run} = intersect(allAsDirErrorInds, runInds{run});
     psOtherErrorInds{run} = intersect(allPsOtherErrorInds, runInds{run});
     asOtherErrorInds{run} = intersect(allAsOtherErrorInds, runInds{run});
-    eyeInds{run} = intersect(find(eyeTimes >= MRIstartTimes(run)), find(eyeTimes < (MRIstartTimes(run)+numVols*TR*1000)));
+    eyeInds{run} = intersect(find(eyeTimes >= MRIstartTimes(run)), find(eyeTimes < (MRIstartTimes(run)+133*TR*1000)));
 end
  
 % output environment variables in terms of MR timeseries volume for FEAT analysis
 for run = 1:length(validRuns)
-    ev.pspstargOnsetTime{run} =  saccparams.all.targetOnsetTime(pspsInds{run});
+    ev.pspstargOnsetTime{run} =  saccparams.all.targetOnsetTime(pspsInds{run}) - MRIstartTimesStd(run);
     ev.pspstargOnsetTime{run} =  [ev.pspstargOnsetTime{run} ones(size(ev.pspstargOnsetTime{run}, 1), 1) ones(size(ev.pspstargOnsetTime{run}, 1), 1)];
-    ev.aspstargOnsetTime{run} =  saccparams.all.targetOnsetTime(aspsInds{run});
+    ev.aspstargOnsetTime{run} =  saccparams.all.targetOnsetTime(aspsInds{run})- MRIstartTimesStd(run);
     ev.aspstargOnsetTime{run} =  [ev.aspstargOnsetTime{run} ones(size(ev.aspstargOnsetTime{run}, 1), 1) ones(size(ev.aspstargOnsetTime{run}, 1), 1)];
-    ev.errpstargOnsetTime{run} =  saccparams.all.targetOnsetTime(errpsInds{run});
+    ev.errpstargOnsetTime{run} =  saccparams.all.targetOnsetTime(errpsInds{run})- MRIstartTimesStd(run);
     ev.errpstargOnsetTime{run} =  [ev.errpstargOnsetTime{run} ones(size(ev.errpstargOnsetTime{run}, 1), 1) ones(size(ev.errpstargOnsetTime{run}, 1), 1)];
   
-    ev.asastargOnsetTime{run} =  saccparams.all.targetOnsetTime(asasInds{run});
+    ev.asastargOnsetTime{run} =  saccparams.all.targetOnsetTime(asasInds{run})- MRIstartTimesStd(run);
     ev.asastargOnsetTime{run} =  [ev.asastargOnsetTime{run} ones(size(ev.asastargOnsetTime{run}, 1), 1) ones(size(ev.asastargOnsetTime{run}, 1), 1)];
-    ev.psastargOnsetTime{run} =  saccparams.all.targetOnsetTime(psasInds{run});
+    ev.psastargOnsetTime{run} =  saccparams.all.targetOnsetTime(psasInds{run})- MRIstartTimesStd(run);
     ev.psastargOnsetTime{run} =  [ev.psastargOnsetTime{run} ones(size(ev.psastargOnsetTime{run}, 1), 1) ones(size(ev.psastargOnsetTime{run}, 1), 1)];
-    ev.errastargOnsetTime{run} =  saccparams.all.targetOnsetTime(errasInds{run});
+    ev.errastargOnsetTime{run} =  saccparams.all.targetOnsetTime(errasInds{run})- MRIstartTimesStd(run);
     ev.errastargOnsetTime{run} =  [ev.errastargOnsetTime{run} ones(size(ev.errastargOnsetTime{run}, 1), 1) ones(size(ev.errastargOnsetTime{run}, 1), 1)];
     
-    ev.psDirErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(psDirErrorInds{run});
+    ev.psDirErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(psDirErrorInds{run})- MRIstartTimesStd(run);
     ev.psDirErrortargOnsetTime{run} =  [ev.psDirErrortargOnsetTime{run} ones(size(ev.psDirErrortargOnsetTime{run}, 1), 1) ones(size(ev.psDirErrortargOnsetTime{run}, 1), 1)];
-    ev.asDirErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(asDirErrorInds{run});
+    ev.asDirErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(asDirErrorInds{run})- MRIstartTimesStd(run);
     ev.asDirErrortargOnsetTime{run} =  [ev.asDirErrortargOnsetTime{run} ones(size(ev.asDirErrortargOnsetTime{run}, 1), 1) ones(size(ev.asDirErrortargOnsetTime{run}, 1), 1)];
-    ev.psOtherErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(psOtherErrorInds{run});
+    ev.psOtherErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(psOtherErrorInds{run})- MRIstartTimesStd(run);
     ev.psOtherErrortargOnsetTime{run} =  [ev.psOtherErrortargOnsetTime{run} ones(size(ev.psOtherErrortargOnsetTime{run}, 1), 1) ones(size(ev.psOtherErrortargOnsetTime{run}, 1), 1)];
-    ev.asOtherErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(asOtherErrorInds{run});
+    ev.asOtherErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(asOtherErrorInds{run})- MRIstartTimesStd(run);
     ev.asOtherErrortargOnsetTime{run} =  [ev.asOtherErrortargOnsetTime{run} ones(size(ev.asOtherErrortargOnsetTime{run}, 1), 1) ones(size(ev.asOtherErrortargOnsetTime{run}, 1), 1)];
-    ev.eye{1} = [(eyeTimes(eyeInds{run})-MRIstartTimes(run))/1000 ones(size(eyeInds{run}, 1),1)*eyeRes/1000 eyeVel(eyeInds{run})];
+    ev.eye{run} = [(eyeTimes(eyeInds{run})-MRIstartTimes(run))/1000 ones(size(eyeInds{run}, 1),1)*eyeRes/1000 eyeVel(eyeInds{run})];
 end
 
 
