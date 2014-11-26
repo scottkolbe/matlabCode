@@ -361,11 +361,11 @@ for run = 1:length(validRuns)
     ev.errpstargOnsetTime{run} =  [ev.errpstargOnsetTime{run} ones(size(ev.errpstargOnsetTime{run}, 1), 1) ones(size(ev.errpstargOnsetTime{run}, 1), 1)];
   
     ev.asastargOnsetTime{run} =  saccparams.all.targetOnsetTime(asasInds{run});
-    ev.asastargOnsetTime{run} =  [ev.asastargOnsetTime{run} ones(size(ev.asastargOnsetTime{run}, 1), 1) ones(size(ev.asastargOnsetTime{run}, 1), 1)];
-    ev.psastargOnsetTime{run} =  saccparams.all.targetOnsetTime(psasInds{run});
-    ev.psastargOnsetTime{run} =  [ev.psastargOnsetTime{run} ones(size(ev.psastargOnsetTime{run}, 1), 1) ones(size(ev.psastargOnsetTime{run}, 1), 1)];
-    ev.errastargOnsetTime{run} =  saccparams.all.targetOnsetTime(errasInds{run});
-    ev.errastargOnsetTime{run} =  [ev.errastargOnsetTime{run} ones(size(ev.errastargOnsetTime{run}, 1), 1) ones(size(ev.errastargOnsetTime{run}, 1), 1)];
+    ev.asastargOnsetTime{run} =  [ev.asastargOnsetTime{run} ones(size(ev.pspstargOnsetTime{run}, 1), 1) ones(size(ev.pspstargOnsetTime{run}, 1), 1)];
+    ev.aspstargOnsetTime{run} =  saccparams.all.targetOnsetTime(aspsInds{run});
+    ev.aspstargOnsetTime{run} =  [ev.aspstargOnsetTime{run} ones(size(ev.aspstargOnsetTime{run}, 1), 1) ones(size(ev.aspstargOnsetTime{run}, 1), 1)];
+    ev.errpstargOnsetTime{run} =  saccparams.all.targetOnsetTime(errpsInds{run});
+    ev.errpstargOnsetTime{run} =  [ev.errpstargOnsetTime{run} ones(size(ev.errpstargOnsetTime{run}, 1), 1) ones(size(ev.errpstargOnsetTime{run}, 1), 1)];
     
     ev.psDirErrortargOnsetTime{run} =  saccparams.all.targetOnsetTime(psDirErrorInds{run});
     ev.psDirErrortargOnsetTime{run} =  [ev.psDirErrortargOnsetTime{run} ones(size(ev.psDirErrortargOnsetTime{run}, 1), 1) ones(size(ev.psDirErrortargOnsetTime{run}, 1), 1)];

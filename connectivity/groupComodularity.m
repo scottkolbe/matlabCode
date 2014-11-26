@@ -9,7 +9,7 @@ for subj=1:size(corrMat,3)
     Ci = zeros(size(corrMat, 1), numSamps);
     % calculate modularity for each sample
     for ii = 1:numSamps
-        [Ci(:,ii), modularity.Q(subj,ii)]= modularity_louvain_und_sign(thisMat);
+        [Ci(:,ii), modularity.Q(subj,ii)]= modularity_louvain_und_sign(thisMat, 'gja');
         for nodeI=1:size(Ci,1)
             for nodeJ=1:size(Ci,1)
                 if Ci(nodeI, ii)==Ci(nodeJ, ii)

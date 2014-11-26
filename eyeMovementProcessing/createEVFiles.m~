@@ -1,38 +1,111 @@
 function createEVFiles(ev)
 
-% save text files
-saveVar = ev.ps.targOnsetTime{1};
+% PSPS
+saveVar = ev.pspstargOnsetTime{1};
 if ~isempty(saveVar)
-    save('run1PS.txt', 'saveVar', '-ASCII');
+    save('run1PSPS.txt', 'saveVar', '-ASCII');
 end
-saveVar = ev.ps.targOnsetTime{2};
+saveVar = ev.pspstargOnsetTime{2};
 if ~isempty(saveVar)
-    save('run2PS.txt', 'saveVar', '-ASCII');
+    save('run2PSPS.txt', 'saveVar', '-ASCII');
 end
-saveVar = ev.ps.targOnsetTime{3};
+saveVar = ev.pspstargOnsetTime{3};
 if ~isempty(saveVar)
-    save('run3PS.txt', 'saveVar', '-ASCII');
+    save('run3PSPS.txt', 'saveVar', '-ASCII');
 end
-saveVar = ev.ps.targOnsetTime{4};
+saveVar = ev.pspstargOnsetTime{4};
 if ~isempty(saveVar)
-    save('run4PS.txt', 'saveVar', '-ASCII');
+    save('run4PSPS.txt', 'saveVar', '-ASCII');
 end
 
-saveVar = ev.as.targOnsetTime{1};
+% ASPS
+saveVar = ev.aspstargOnsetTime{1};
 if ~isempty(saveVar)
-    save('run1AS.txt', 'saveVar', '-ASCII');
+    save('run1ASPS.txt', 'saveVar', '-ASCII');
 end
-saveVar = ev.as.targOnsetTime{2};
+saveVar = ev.aspstargOnsetTime{2};
 if ~isempty(saveVar)
-    save('run2AS.txt', 'saveVar', '-ASCII');
+    save('run2ASPS.txt', 'saveVar', '-ASCII');
 end
-saveVar = ev.as.targOnsetTime{3};
+saveVar = ev.aspstargOnsetTime{3};
 if ~isempty(saveVar)
-    save('run3AS.txt', 'saveVar', '-ASCII');
+    save('run3ASPS.txt', 'saveVar', '-ASCII');
 end
-saveVar = ev.as.targOnsetTime{4};
+saveVar = ev.aspstargOnsetTime{4};
 if ~isempty(saveVar)
-    save('run4AS.txt', 'saveVar', '-ASCII');
+    save('run4ASPS.txt', 'saveVar', '-ASCII');
+end
+
+% ErrPS
+saveVar = ev.errpstargOnsetTime{1};
+if ~isempty(saveVar)
+    save('run1ERRPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.errpstargOnsetTime{2};
+if ~isempty(saveVar)
+    save('run2ERRPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.errpstargOnsetTime{3};
+if ~isempty(saveVar)
+    save('run3ERRPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.errpstargOnsetTime{4};
+if ~isempty(saveVar)
+    save('run4ERRPS.txt', 'saveVar', '-ASCII');
+end
+
+% ASAS
+saveVar = ev.asastargOnsetTime{1};
+if ~isempty(saveVar)
+    save('run1ASAS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.asastargOnsetTime{2};
+if ~isempty(saveVar)
+    save('run2ASAS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.asastargOnsetTime{3};
+if ~isempty(saveVar)
+    save('run3ASAS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.asastargOnsetTime{4};
+if ~isempty(saveVar)
+    save('run4ASAS.txt', 'saveVar', '-ASCII');
+end
+
+% PSAS
+saveVar = ev.psastargOnsetTime{1};
+if ~isempty(saveVar)
+    save('run1ASPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.psastargOnsetTime{2};
+if ~isempty(saveVar)
+    save('run2ASPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.psastargOnsetTime{3};
+if ~isempty(saveVar)
+    save('run3ASPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.psastargOnsetTime{4};
+if ~isempty(saveVar)
+    save('run4ASPS.txt', 'saveVar', '-ASCII');
+end
+
+% ErrAS
+saveVar = ev.errpstargOnsetTime{1};
+if ~isempty(saveVar)
+    save('run1ERRPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.errpstargOnsetTime{2};
+if ~isempty(saveVar)
+    save('run2ERRPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.errpstargOnsetTime{3};
+if ~isempty(saveVar)
+    save('run3ERRPS.txt', 'saveVar', '-ASCII');
+end
+saveVar = ev.errpstargOnsetTime{4};
+if ~isempty(saveVar)
+    save('run4ERRPS.txt', 'saveVar', '-ASCII');
 end
 
 saveVar = ev.ps.DirErrortargOnsetTime{1};
