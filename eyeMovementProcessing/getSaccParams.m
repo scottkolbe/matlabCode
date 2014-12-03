@@ -285,8 +285,8 @@ MRIstartTimesStd = (MRIstartTimes - saccparams.all.triggerTimes(1))/1000;
 %% Find target onsets
 
 % find target onset indices for correct and error trials
-allPsDirErrorInds =[find(strcmp(saccparams.ps.errorType,'Dir')); find(strcmp(saccparams.ps.errorType,'Dirx2'))];
-allAsDirErrorInds = [find(strcmp(saccparams.as.errorType,'Dir')); find(strcmp(saccparams.as.errorType,'Dirx2'))];
+allPsDirErrorInds =[find(strcmp(saccparams.ps.errorType,'Dir')); find(strcmp(saccparams.ps.errorType,'dir')); find(strcmp(saccparams.ps.errorType,'Dirx2'))];
+allAsDirErrorInds = [find(strcmp(saccparams.as.errorType,'Dir')); find(strcmp(saccparams.as.errorType, 'dir')); find(strcmp(saccparams.as.errorType,'Dirx2'))];
 allPsOtherErrorInds = [find(strcmp(saccparams.ps.errorType,'blink')); find(strcmp(saccparams.ps.errorType,'sigdrop')); ...
     find(strcmp(saccparams.ps.errorType,'unstab')); find(strcmp(saccparams.ps.errorType,'antic'))];
 allAsOtherErrorInds = [find(strcmp(saccparams.as.errorType,'blink')); find(strcmp(saccparams.as.errorType,'sigdrop')); ...
