@@ -268,7 +268,7 @@ clearvars data raw cellVectors R;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find start times of each valid fMRI run (>numVols volumes) and normalise onset times
 saccparams.all.triggerIntervals = saccparams.all.triggerTimes(2:end)-saccparams.all.triggerTimes(1:end-1);
-initialRunTriggers = find(saccparams.all.triggerIntervals > TR*1000+5)+1; % allow +5ms error in trigger timing
+initialRunTriggers = find(saccparams.all.triggerIntervals > 4*TR*1000+5)+1; % allow +5ms error in trigger timing
 MRIstartInds = 1;
 for ii = 1:length(initialRunTriggers)
         MRIstartInds = [MRIstartInds; initialRunTriggers(ii)];
