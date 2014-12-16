@@ -1,5 +1,5 @@
 %% script to locate theshold using 2 sample gaussian mixture model
-
+warning('off', 'all');
 FSdir = getenv('FREESURFER_HOME');
 path(path, [FSdir '/matlab']);
 
