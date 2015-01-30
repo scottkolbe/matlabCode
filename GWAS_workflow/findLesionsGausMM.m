@@ -9,8 +9,11 @@ Y = sort(voxVals(voxVals > 5));
 s = zeros(length(Y), 1);
 s(round(length(Y)*0.75):end) = 1;
 s = s+1;
+numSamps = 20;
+threshold = zeros(numSamps, 1);
 
-for ii = 1:100
+for ii = 1:numSamps
+    disp(sprintf('sample %i', ii))
     obj = gmdistribution.fit(Y,2,'Start',s);
     [~,I] = min(obj.mu);
     threshold(ii) = Y(round(length(Y)*obj.PComponents(I)));

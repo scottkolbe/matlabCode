@@ -389,3 +389,5 @@ for run = 1:length(validRuns)
     ev.asOtherErrortargOnsetTime{run} =  [ev.asOtherErrortargOnsetTime{run} ones(size(ev.asOtherErrortargOnsetTime{run}, 1), 1) ones(size(ev.asOtherErrortargOnsetTime{run}, 1), 1)];
     ev.eye{run} = [(eyeTimes(eyeInds{run})-MRIstartTimes(run))/1000 ones(size(eyeInds{run}, 1),1)*eyeRes/1000 eyeVel(eyeInds{run})];
 end
+
+
