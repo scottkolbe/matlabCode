@@ -1,4 +1,4 @@
-function [saccparams, ev] = getSaccParams(matFile, triggerFile, targetsFile, xlsFile, study)
+function [saccparams, ev] = getSaccParams(matFile, triggerFile, targetsFile, xlsFile, study, plotRuns)
 
 % STUDY = 'arc' / 'pmfx' 
 
@@ -287,7 +287,32 @@ for run = 1:length(validRuns)
 end
 
 MRIstartTimesStd = (MRIstartTimes - saccparams.all.triggerTimes(1))/1000;
- 
+
+if true(plotRuns)
+    figure(1)
+    subplot(2,1,1)
+    plot(eyeTimes)
+    hold on
+    for run = 1:length(MRIstartTimes)
+        plot([0 length(eyeTimes)], [MRIstartTimes(run) MRIstartTimes(run)], 'r');
+    end
+    title('Eyelink samples with valid run start times')
+    xlabel('Samples')
+    ylabel('Time')
+    xlim([0 length(eyeTimes)])
+    
+    subplot(2,1,2)
+    plot(saccparams.all.triggerTimes)
+    hold on
+    for run = 1:length(MRIstartTimes)
+        plot([0 length(saccparams.all.triggerTimes)], [MRIstartTimes(run) MRIstartTimes(run)], 'r');
+    end
+    title('MRI triggers with valid run start times')
+    xlabel('Triggers')
+    ylabel('Time')
+    xlim([0 length(saccparams.all.triggerTimes)])
+end
+
 %% Find target onsets
 
 % find target onset indices for correct and error trials
