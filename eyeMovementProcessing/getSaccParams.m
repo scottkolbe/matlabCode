@@ -1,6 +1,6 @@
 function [saccparams, ev] = getSaccParams(matFile, triggerFile, targetsFile, xlsFile, study, plotRuns)
 
-% STUDY = 'arc' / 'pmfx' 
+% STUDY = 'arc' / 'pmfx'
 
 %% initialise some variables
 saccparams = struct;
@@ -91,6 +91,57 @@ end
 %% Clear temporary variables
 clearvars filename formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp me;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Find start times of each valid fMRI run (>numVols volumes) and normalise onset times
+validTriggerTimes = saccparams.all.triggerTimes(find(saccparams.all.triggerTimes >= eyeTimes(1)-1000));
+saccparams.all.triggerIntervals = validTriggerTimes(2:end)-validTriggerTimes(1:end-1);
+initialRunTriggers = [1; find(saccparams.all.triggerIntervals > 4*TR*1000+5)+1]; % allow +5ms error in trigger timing
+finalRunTriggers = [find(saccparams.all.triggerIntervals > 4*TR*1000+5); length(saccparams.all.triggerIntervals)];
+discontinuities = unique(sort([initialRunTriggers; finalRunTriggers]));
+validRuns = [];
+for ii = 1:length(discontinuities)-1
+    runTimes(ii) = sum(saccparams.all.triggerIntervals(discontinuities(ii):discontinuities(ii+1)));
+    
+    if runTimes(ii) >= numVols*TR*1000
+        validRuns(ii) = ii;
+    end
+end
+validRuns = validRuns(find(validRuns));
+disp(sprintf('Found %i valid runs: \n', length(validRuns)));
+for run = 1:length(validRuns)
+    disp(sprintf('Run %i : %0.3f seconds \n', validRuns(run), runTimes(validRuns(run))));
+    MRIstartTimes(run) = validTriggerTimes(discontinuities(validRuns(run)));
+end
+
+MRIstartTimesStd = (MRIstartTimes - validTriggerTimes(1))/1000;
+MRIstartTimesSecs = MRIstartTimes / 1000;
+
+if true(plotRuns)
+    figure(1)
+    subplot(2,1,1)
+    plot(eyeTimes)
+    hold on
+    for run = 1:length(MRIstartTimes)
+        plot([0 length(eyeTimes)], [MRIstartTimes(run) MRIstartTimes(run)], 'r');
+    end
+    title('Eyelink samples with valid run onset times')
+    xlabel('Samples')
+    ylabel('Time')
+    xlim([0 length(eyeTimes)])
+    hold off
+    
+    subplot(2,1,2)
+    plot(validTriggerTimes)
+    hold on
+    for run = 1:length(MRIstartTimes)
+        plot([0 length(validTriggerTimes)], [MRIstartTimes(run) MRIstartTimes(run)], 'r');
+    end
+    title('MRI triggers with valid run onset times')
+    xlabel('Triggers')
+    ylabel('Time')
+    xlim([0 length(validTriggerTimes)])
+    hold off
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,8 +229,8 @@ saccparams.all.cueOnsetTime = saccparams.all.cueOnsetTime';
 
 
 saccparams.all.targetDelays = saccparams.all.targetOnsetTime - saccparams.all.cueOnsetTime;
-saccparams.all.targetOnsetTime = (saccparams.all.targetOnsetTime - saccparams.all.triggerTimes(1)) /1000;
-saccparams.all.cueOnsetTime = (saccparams.all.cueOnsetTime - saccparams.all.triggerTimes(1)) /1000;
+saccparams.all.targetOnsetTime = (saccparams.all.targetOnsetTime - validTriggerTimes(1)) /1000;
+saccparams.all.cueOnsetTime = (saccparams.all.cueOnsetTime - validTriggerTimes(1)) /1000;
 
 %% Clear temporary variables
 clearvars filename delimiter formatSpec fileID dataArray ans;
@@ -265,53 +316,6 @@ saccparams.as.peakVelDIVmeanVel = data(:,54);
 %% Clear temporary variables
 clearvars data raw cellVectors R;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Find start times of each valid fMRI run (>numVols volumes) and normalise onset times
-saccparams.all.triggerIntervals = saccparams.all.triggerTimes(2:end)-saccparams.all.triggerTimes(1:end-1);
-initialRunTriggers = find(saccparams.all.triggerIntervals > 4*TR*1000+5)+1; % allow +5ms error in trigger timing
-finalRunTriggers = [find(saccparams.all.triggerIntervals > 4*TR*1000+5); length(saccparams.all.triggerIntervals)];
-discontinuities = sort([initialRunTriggers; finalRunTriggers]);
-validRuns = [];
-for ii = 1:length(discontinuities)-1
-   runTimes(ii) = sum(saccparams.all.triggerIntervals(discontinuities(ii):discontinuities(ii+1)));
-
-if runTimes(ii) >= numVols*TR*1000
-       validRuns(ii) = ii;
-end
-end
-validRuns = validRuns(find(validRuns));
-disp(sprintf('Found %i valid runs: \n', length(validRuns)));
-for run = 1:length(validRuns)
-    disp(sprintf('Run %i : %0.3f seconds \n', validRuns(run), runTimes(validRuns(run))));
-    MRIstartTimes(run) = saccparams.all.triggerTimes(discontinuities(validRuns(run)));
-end
-
-MRIstartTimesStd = (MRIstartTimes - saccparams.all.triggerTimes(1))/1000;
-
-if true(plotRuns)
-    figure(1)
-    subplot(2,1,1)
-    plot(eyeTimes)
-    hold on
-    for run = 1:length(MRIstartTimes)
-        plot([0 length(eyeTimes)], [MRIstartTimes(run) MRIstartTimes(run)], 'r');
-    end
-    title('Eyelink samples with valid run start times')
-    xlabel('Samples')
-    ylabel('Time')
-    xlim([0 length(eyeTimes)])
-    
-    subplot(2,1,2)
-    plot(saccparams.all.triggerTimes)
-    hold on
-    for run = 1:length(MRIstartTimes)
-        plot([0 length(saccparams.all.triggerTimes)], [MRIstartTimes(run) MRIstartTimes(run)], 'r');
-    end
-    title('MRI triggers with valid run start times')
-    xlabel('Triggers')
-    ylabel('Time')
-    xlim([0 length(saccparams.all.triggerTimes)])
-end
 
 %% Find target onsets
 
@@ -380,14 +384,14 @@ for run = 1:length(validRuns)
     asasInds{run} = intersect(allAsAsInds, runInds{run});
     psasInds{run} = intersect(allPsAsInds, runInds{run});
     errasInds{run} = intersect(allErrAsInds, runInds{run});
-     
+    
     psDirErrorInds{run} = intersect(allPsDirErrorInds, runInds{run});
     asDirErrorInds{run} = intersect(allAsDirErrorInds, runInds{run});
     psOtherErrorInds{run} = intersect(allPsOtherErrorInds, runInds{run});
     asOtherErrorInds{run} = intersect(allAsOtherErrorInds, runInds{run});
     eyeInds{run} = intersect(find(eyeTimes >= MRIstartTimes(run)), find(eyeTimes < (MRIstartTimes(run)+133*TR*1000)));
 end
- 
+
 % output environment variables in terms of MR timeseries volume for FEAT analysis
 for run = 1:length(validRuns)
     ev.pspstargOnsetTime{run} =  saccparams.all.targetOnsetTime(pspsInds{run}) - MRIstartTimesStd(run);
@@ -396,7 +400,7 @@ for run = 1:length(validRuns)
     ev.aspstargOnsetTime{run} =  [ev.aspstargOnsetTime{run} ones(size(ev.aspstargOnsetTime{run}, 1), 1) ones(size(ev.aspstargOnsetTime{run}, 1), 1)];
     ev.errpstargOnsetTime{run} =  saccparams.all.targetOnsetTime(errpsInds{run})- MRIstartTimesStd(run);
     ev.errpstargOnsetTime{run} =  [ev.errpstargOnsetTime{run} ones(size(ev.errpstargOnsetTime{run}, 1), 1) ones(size(ev.errpstargOnsetTime{run}, 1), 1)];
-  
+    
     ev.asastargOnsetTime{run} =  saccparams.all.targetOnsetTime(asasInds{run})- MRIstartTimesStd(run);
     ev.asastargOnsetTime{run} =  [ev.asastargOnsetTime{run} ones(size(ev.asastargOnsetTime{run}, 1), 1) ones(size(ev.asastargOnsetTime{run}, 1), 1)];
     ev.psastargOnsetTime{run} =  saccparams.all.targetOnsetTime(psasInds{run})- MRIstartTimesStd(run);
