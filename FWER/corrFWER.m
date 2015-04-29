@@ -1,5 +1,12 @@
 function [FWERCorrP, unpermutedR] = corrFWER(data, dataType, behavData1, behavData2, pThresh, numSamps)
 
+% data: either a 4D array of 3D fMRI Z volumes or a 3D array of 2D connectivity Z matrices
+% dataType: fMRI volumetric data (1) or connectivity matrices (2)
+% behavData1: the behaviour or covariate of interest (1-D column)
+% behavData2: nuisance regressors (2D with each column as an additional variable)
+% pThresh: initial threshold for p-value (usually 0.05 or 0.01)
+% numSamps: number of permutation samples (defines the precision of final p-vales, optimal >1000)
+
 % start parallel matlab pool if not already open
 if isempty(gcp)
     parpool('local');

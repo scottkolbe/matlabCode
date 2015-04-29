@@ -1,7 +1,7 @@
 goodAcc = find(AS_1stSacPosErr_outlier<median(AS_1stSacPosErr_outlier));
 badAcc = find(AS_1stSacPosErr_outlier>median(AS_1stSacPosErr_outlier));
 
-% goodAcc = find(AS_latency<median(AS_latency));
+goodAcc = find(AS_latency<median(AS_latency));
 % badAcc = find(AS_latency>median(AS_latency));
 
 badAccMod = mean(modularity.meanCoModSubj(:,:,badAcc), 3);
@@ -31,13 +31,13 @@ end
 figure
 subplot(3,2,1)
 imagesc(mean(matZ_3D_outlier(:,:,badAcc), 3));
-caxis([-0.2 0.6])
-title('Low Accuracy Group')
+caxis([-0.2 1])
+title('Bad Accuracy Group')
 ylabel('Mean Connectivity (Z)')
 subplot(3,2,2)
 imagesc(mean(matZ_3D_outlier(:,:,goodAcc), 3));
-caxis([-0.2 0.6])
-title('High Accuracy Group')
+caxis([-0.2 1])
+title('GoodAccuracy Group')
 subplot(3,2,3)
 imagesc(badAccMod)
 ylabel('Mean Comodularity')
