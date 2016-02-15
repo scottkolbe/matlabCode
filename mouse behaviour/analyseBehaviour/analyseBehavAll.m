@@ -85,7 +85,16 @@ for behav = 1:numBehav
     % plot onsets
     figure(1)
     subplot(ceil(numBehav/2),2,behav)
-    thisData = squeeze(nanmean(durationsTable(:,:,[1 3],behav), 3));
+    thisData = squeeze(durationsTable(:,:,1 ,behav));
+    A = thisData(:,1);
+    A = A(~isnan(A));
+    H(behav,1) = kstest(A);
+    A = thisData(:,2);
+    A = A(~isnan(A));
+    H(behav,2) = kstest(A);
+    
+    
+    
     boxplot([thisData(:,1);thisData(:,2)], [[zeros(size(thisData, 1), 1); ones(size(thisData, 1), 1)] [genoVect';genoVect'] [housingVect';housingVect']])
     title([allBehav{behav} ' durations'])
      set(gca,'XTick',[1 2 3 4 5 6 7 8],...

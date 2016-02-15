@@ -329,8 +329,8 @@ allAsOtherErrorInds = [find(strcmp(saccparams.as.errorType,'blink')); find(strcm
 
 allErrInds = sort([allPsDirErrorInds; allAsDirErrorInds; allPsOtherErrorInds; allAsOtherErrorInds]);
 
-allPsInds = find(~isnan(saccparams.as.latency));
-allAsInds = find(~isnan(saccparams.ps.latency));
+allPsInds = find(~isnan(saccparams.ps.latency));
+allAsInds = find(~isnan(saccparams.as.latency));
 allPsPsInds = [];
 allAsPsInds = [];
 allErrPsInds = [];
