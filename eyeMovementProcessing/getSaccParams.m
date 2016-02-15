@@ -323,9 +323,9 @@ clearvars data raw cellVectors R;
 allPsDirErrorInds =[find(strcmp(saccparams.ps.errorType,'Dir')); find(strcmp(saccparams.ps.errorType,'dir')); find(strcmp(saccparams.ps.errorType,'Dirx2'))];
 allAsDirErrorInds = [find(strcmp(saccparams.as.errorType,'Dir')); find(strcmp(saccparams.as.errorType, 'dir')); find(strcmp(saccparams.as.errorType,'Dirx2'))];
 allPsOtherErrorInds = [find(strcmp(saccparams.ps.errorType,'blink')); find(strcmp(saccparams.ps.errorType,'sigdrop')); ...
-    find(strcmp(saccparams.ps.errorType,'unstab')); find(strcmp(saccparams.ps.errorType,'antic'))];
+    find(strcmp(saccparams.ps.errorType,'unstab')); find(strcmp(saccparams.ps.errorType,'antic'));find(strcmp(saccparams.ps.errorType,'slowwave'))];
 allAsOtherErrorInds = [find(strcmp(saccparams.as.errorType,'blink')); find(strcmp(saccparams.as.errorType,'sigdrop')); ...
-    find(strcmp(saccparams.as.errorType,'unstab')); find(strcmp(saccparams.as.errorType,'antic'))];
+    find(strcmp(saccparams.as.errorType,'unstab')); find(strcmp(saccparams.as.errorType,'antic'));find(strcmp(saccparams.ps.errorType,'slowwave'))];
 
 allErrInds = sort([allPsDirErrorInds; allAsDirErrorInds; allPsOtherErrorInds; allAsOtherErrorInds]);
 
